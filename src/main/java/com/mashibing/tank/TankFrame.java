@@ -13,7 +13,6 @@ public class TankFrame extends Frame {
 
     private GameModel gm = new GameModel();
 
-
     private TankFrame() {
         this.setTitle("tank war");
         this.setLocation(400, 100);
@@ -45,8 +44,6 @@ public class TankFrame extends Frame {
         paint(gOffScreen);
         g.drawImage(offScreenImage, 0, 0, null);
     }
-
-
 
     private class TankKeyListener extends KeyAdapter {
 
@@ -106,6 +103,4 @@ public class TankFrame extends Frame {
     public GameModel getGm() {
         return this.gm;
     }
-
-
 }
