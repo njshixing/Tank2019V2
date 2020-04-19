@@ -52,16 +52,13 @@ class MyChildChannelHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
         String message = buf.toString(StandardCharsets.UTF_8);
-        System.out.println("server1:" + ChatServer.clients.size());
         if ("__bye__".equals(message)) {
             System.out.println(ctx.channel().remoteAddress() + " ready to quit...");
             ChatServer.clients.remove(ctx.channel());
             ReferenceCountUtil.release(msg);
         } else {
-            System.out.println(ChatServer.clients.size());
             ChatServer.clients.writeAndFlush(msg);
         }
-        System.out.println("server2:" + ChatServer.clients.size());
     }
 
     @Override
