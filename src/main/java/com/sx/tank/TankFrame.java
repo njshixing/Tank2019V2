@@ -1,6 +1,6 @@
 package com.sx.tank;
 
-
+import com.sx.tank.listener.TankKeyListener;
 import com.sx.tank.model.GameModel;
 
 import java.awt.*;
@@ -10,19 +10,19 @@ public class TankFrame extends Frame {
     public static final int GAME_WIDTH = 1024, GAME_HEIGHT = 768;
     private Image offScreenImage = null;
 
-    private GameModel gameModel;
+    private GameModel gm = new GameModel();
 
     private TankFrame() {
         this.setTitle("tank war");
         this.setLocation(400, 100);
         this.setSize(GAME_WIDTH, GAME_HEIGHT);
-        gameModel = new GameModel();
-//        this.addKeyListener(new com.mashibing.tank.TankFrame.TankKeyListener());
+        // 加入键盘监听
+        this.addKeyListener(new TankKeyListener(gm.getPlayer()));
     }
 
     @Override
     public void paint(Graphics g) {
-        gameModel.paint(g);
+        gm.paint(g);
     }
 
     @Override
@@ -37,5 +37,13 @@ public class TankFrame extends Frame {
         gOffScreen.setColor(c);
         paint(gOffScreen);
         g.drawImage(offScreenImage, 0, 0, null);
+    }
+
+    public GameModel getGm() {
+        return gm;
+    }
+
+    public void setGm(GameModel gm) {
+        this.gm = gm;
     }
 }
