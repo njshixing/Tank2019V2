@@ -1,7 +1,6 @@
 package com.mashibing.tank;
 
-import com.sx.tank.model.Tank;
-import com.sx.tank.model.TankMessage;
+import com.sx.tank.model.TankJoinMsg;
 import com.sx.tank.utils.MsgDecoder;
 import com.sx.tank.utils.MsgEncoder;
 import io.netty.buffer.ByteBuf;
@@ -16,10 +15,10 @@ public class EncoderAndDecoderTest {
     public void encoder() {
         EmbeddedChannel ch = new EmbeddedChannel();
         ch.pipeline().addLast(new MsgEncoder());
-        TankMessage tankMessage = new TankMessage();
-        tankMessage.setX(5);
-        tankMessage.setY(8);
-        ch.writeOutbound(tankMessage);
+        TankJoinMsg tankJoinMsg = new TankJoinMsg();
+        tankJoinMsg.setX(5);
+        tankJoinMsg.setY(8);
+        ch.writeOutbound(tankJoinMsg);
 
         ByteBuf buf = ch.readOutbound();
 
@@ -38,7 +37,7 @@ public class EncoderAndDecoderTest {
 
         ch.writeInbound(buf);
 
-        TankMessage message = ch.readInbound();
+        TankJoinMsg message = ch.readInbound();
         Assert.assertEquals(5, message.getX());
         Assert.assertEquals(8, message.getY());
     }

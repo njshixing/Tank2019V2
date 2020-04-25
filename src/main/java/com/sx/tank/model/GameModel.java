@@ -11,6 +11,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Data
@@ -18,6 +19,8 @@ public class GameModel implements Serializable {
     private Player player;
     private List<AbstractGameObject> objectList;
     private CollideChain collideChain;
+
+    private Random r = new Random();
 
     public GameModel() {
         objectList = new ArrayList<>();
@@ -28,21 +31,19 @@ public class GameModel implements Serializable {
 
     private void initGameObject() {
         // 初始化player
-        player = new Player(50, 50, Dir.randomDir(), Group.GOOD);
+        player = new Player(50 + r.nextInt(700), 50 + r.nextInt(600), Dir.randomDir(), Group.values()[r.nextInt(Group.values().length)]);
         // 敌人坦克
-        int tankCount = new Random().nextInt(5) + 3;
-        for (int i = 0; i < tankCount; i++) {
-            objectList.add(new Tank(100 + new Random().nextInt(100), 100, Dir.randomDir(), Group.BAD));
-        }
+//        int tankCount = new Random().nextInt(5) + 3;
+//        for (int i = 0; i < tankCount; i++) {
+//            objectList.add(new Tank(100 + new Random().nextInt(100), 100, Dir.randomDir(), Group.BAD));
+//        }
     }
 
     public void paint(Graphics g) {
         Color c = g.getColor();
         g.setColor(Color.WHITE);
-        g.setColor(c);
         g.drawString("objects:" + objectList.size(), 10, 50);
         g.setColor(c);
-        System.out.println("objects:" + objectList.size());
         // 去除die的物体
         objectList = objectList.stream().filter(AbstractGameObject::isLive).collect(Collectors.toList());
 
@@ -110,5 +111,17 @@ public class GameModel implements Serializable {
                 e.printStackTrace();
             }
         }
+    }
+
+    public Player findTankByUuid(UUID uuid) {
+        for (AbstractGameObject object : objectList) {
+            if (object instanceof Player) {
+                Player p = (Player) object;
+                if (p.getId().equals(uuid)) {
+                    return p;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -1,5 +1,10 @@
-package com.sx.tank.net.chat;
+package com.sx.tank.net;
 
+import com.sx.tank.TankFrame;
+import com.sx.tank.model.Player;
+import com.sx.tank.model.TankJoinMsg;
+import com.sx.tank.utils.MsgDecoder;
+import com.sx.tank.utils.MsgEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -7,12 +12,14 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.ReferenceCountUtil;
 
-import java.nio.charset.StandardCharsets;
-
-public class ChatClient {
+public class TankWarClient {
+    public static final TankWarClient INSTANCE = new TankWarClient();
     private Channel channel = null;
+
+    private TankWarClient() {
+
+    }
 
     public void connect() {
         EventLoopGroup executors = new NioEventLoopGroup(1);
@@ -25,9 +32,11 @@ public class ChatClient {
                         protected void initChannel(SocketChannel ch) throws Exception {
                             channel = ch;
                             ch.pipeline()
+                                    .addLast(new MsgDecoder())
+                                    .addLast(new MsgEncoder())
                                     .addLast(new ClientChildHandler());
                         }
-                    }).connect("localhost", 8888).sync();
+                    }).connect("localhost", 12345).sync();
             System.out.println("connected to server");
             future.channel().closeFuture().sync();
         } catch (Exception e) {
@@ -37,30 +46,27 @@ public class ChatClient {
         }
     }
 
-    public void send(String message) {
-        System.out.println("from client:" + message);
-        ByteBuf buf = Unpooled.copiedBuffer(message.getBytes());
-        channel.writeAndFlush(buf);
+    public void send(TankJoinMsg msg) {
+        channel.writeAndFlush(msg);
     }
 
     public void closeConnection() {
-        send("__bye__");
         channel.close();
     }
 
-    private static class ClientChildHandler extends ChannelInboundHandlerAdapter {
+    private static class ClientChildHandler extends SimpleChannelInboundHandler<TankJoinMsg> {
+
         @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            ByteBuf byteBuf = null;
-            try {
-                byteBuf = (ByteBuf) msg;
-                ClientFrame.INSTANCE.updateText(byteBuf.toString(StandardCharsets.UTF_8));
-            } finally {
-                if (null != byteBuf) {
-                    // 无论如何都要释放，因为netty的byteBuf使用的是操作系统的内存，jvm通过referenceCount来回收
-                    ReferenceCountUtil.release(byteBuf);
-                }
-            }
+        protected void channelRead0(ChannelHandlerContext ctx, TankJoinMsg msg) throws Exception {
+            System.out.println(msg.toString());
+            msg.handle();
+        }
+
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            Player p = TankFrame.INSTANCE.getGm().getPlayer();
+            System.out.println(p.getId() + " online");
+            ctx.writeAndFlush(new TankJoinMsg(p));
         }
 
         @Override

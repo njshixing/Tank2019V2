@@ -30,7 +30,7 @@ public class ChatServer {
         // 定义处理客户端传过来的数据类
         b.childHandler(new MyChannelHandler());
 
-        ChannelFuture future = b.bind(8888);
+        ChannelFuture future = b.bind(8888).sync();
         // 等待关闭
         future.channel().closeFuture().sync();
         bossGroup.shutdownGracefully();
@@ -52,6 +52,7 @@ class MyChildChannelHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
         String message = buf.toString(StandardCharsets.UTF_8);
+        System.out.println(message);
         if ("__bye__".equals(message)) {
             System.out.println(ctx.channel().remoteAddress() + " ready to quit...");
             ChatServer.clients.remove(ctx.channel());
