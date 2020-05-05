@@ -1,5 +1,6 @@
 package com.sx.tank.model;
 
+import com.sx.tank.net.TankWarClient;
 import com.sx.tank.service.FireStrategy;
 import com.sx.tank.utils.Dir;
 import com.sx.tank.utils.Group;
@@ -153,8 +154,10 @@ public class Player extends AbstractGameObject {
     }
 
     private void setMainDir() {
+        boolean oldMoving = this.moving;
         if (!bU && !bD && !bL && !bR) {
             moving = false;
+            TankWarClient.INSTANCE.send(new TankStopMsg(this.id, this.x, this.y));
         } else {
             moving = true;
             if (bU && !bD && !bL && !bR) {
@@ -169,6 +172,9 @@ public class Player extends AbstractGameObject {
             if (!bU && !bD && !bL && bR) {
                 dir = Dir.R;
             }
+        }
+        if (this.moving != oldMoving) {
+            TankWarClient.INSTANCE.send(new TankMoveOrDirChangeMsg(this.x, this.y, this.dir, this.id));
         }
     }
 }

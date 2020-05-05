@@ -10,7 +10,7 @@ public class ServerFrame extends Frame {
     TextArea taServer = new TextArea();
     TextArea taClient = new TextArea();
 
-    private TankServer server = new TankServer();
+    private TankWarServer server = new TankWarServer();
 
     public ServerFrame() {
 

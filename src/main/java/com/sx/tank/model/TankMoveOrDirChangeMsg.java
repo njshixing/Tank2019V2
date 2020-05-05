@@ -1,9 +1,7 @@
 package com.sx.tank.model;
 
 import com.sx.tank.TankFrame;
-import com.sx.tank.net.TankWarClient;
 import com.sx.tank.utils.Dir;
-import com.sx.tank.utils.Group;
 import com.sx.tank.utils.MsgType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,23 +11,19 @@ import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class TankJoinMsg extends Msg {
+public class TankMoveOrDirChangeMsg extends Msg {
     private int x, y;
     private Dir dir;
-    private Group group;
     private UUID uuid;
-    private boolean moving;
 
-    public TankJoinMsg() {
+    public TankMoveOrDirChangeMsg() {
     }
 
-    public TankJoinMsg(Player p) {
-        this.x = p.getX();
-        this.y = p.getY();
-        this.dir = p.getDir();
-        this.moving = p.isMoving();
-        this.group = p.getGroup();
-        this.uuid = p.getId();
+    public TankMoveOrDirChangeMsg(int x, int y, Dir dir, UUID uuid) {
+        this.x = x;
+        this.y = y;
+        this.dir = dir;
+        this.uuid = uuid;
     }
 
     @Override
@@ -43,8 +37,6 @@ public class TankJoinMsg extends Msg {
             dos.writeInt(this.x);
             dos.writeInt(this.y);
             dos.writeInt(dir.ordinal());
-            dos.writeBoolean(moving);
-            dos.writeInt(group.ordinal());
             dos.writeLong(uuid.getMostSignificantBits());
             dos.writeLong(uuid.getLeastSignificantBits());
             dos.flush();
@@ -77,8 +69,6 @@ public class TankJoinMsg extends Msg {
             this.x = dis.readInt();
             this.y = dis.readInt();
             this.dir = Dir.values()[dis.readInt()];
-            this.moving = dis.readBoolean();
-            this.group = Group.values()[dis.readInt()];
             this.uuid = new UUID(dis.readLong(), dis.readLong());
         } catch (IOException e) {
             e.printStackTrace();
@@ -92,32 +82,33 @@ public class TankJoinMsg extends Msg {
     }
 
     @Override
-    public String toString() {
-        return "TankMessage{" +
-                "x=" + x +
-                ", y=" + y +
-                ", dir=" + dir +
-                ", group=" + group +
-                ", uuid='" + uuid + '\'' +
-                ", moving=" + moving +
-                '}';
-    }
-
-    @Override
     public void handle() {
+        // 如果是自己
         if (this.uuid.equals(TankFrame.INSTANCE.getGm().getPlayer().getId())) {
             return;
         }
-        if (TankFrame.INSTANCE.getGm().findTankByUuid(this.uuid) != null) {
-            return;
+        // 不是自己
+        Player p = TankFrame.INSTANCE.getGm().findTankByUuid(this.uuid);
+        if (null != p) {
+            p.setMoving(true);
+            p.setX(this.x);
+            p.setY(this.y);
+            p.setDir(this.dir);
         }
-        Player player = new Player(this);
-        TankFrame.INSTANCE.getGm().addObject(player);
-        TankWarClient.INSTANCE.send(new TankJoinMsg(TankFrame.INSTANCE.getGm().getPlayer()));
     }
 
     @Override
     public MsgType getMsgType() {
-        return MsgType.TankJoin;
+        return MsgType.TankMoveOrDirChange;
+    }
+
+    @Override
+    public String toString() {
+        return "TankMoveOrDirChangeMsg{" +
+                "x=" + x +
+                ", y=" + y +
+                ", dir=" + dir +
+                ", uuid=" + uuid +
+                '}';
     }
 }

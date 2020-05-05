@@ -1,14 +1,14 @@
 package com.sx.tank.utils;
 
-import com.sx.tank.model.TankJoinMsg;
+import com.sx.tank.model.Msg;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-public class MsgEncoder extends MessageToByteEncoder<TankJoinMsg> {
+public class MsgEncoder extends MessageToByteEncoder<Msg> {
     @Override
-    protected void encode(ChannelHandlerContext ctx, TankJoinMsg msg, ByteBuf out) throws Exception {
-        System.out.println("encode:" + msg.toString());
+    protected void encode(ChannelHandlerContext ctx, Msg msg, ByteBuf out) throws Exception {
+        out.writeInt(msg.getMsgType().ordinal());
         byte[] bytes = msg.toBytes();
         // 先告知长度
         out.writeInt(bytes.length);

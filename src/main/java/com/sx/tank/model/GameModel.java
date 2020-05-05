@@ -46,7 +46,6 @@ public class GameModel implements Serializable {
         g.setColor(c);
         // 去除die的物体
         objectList = objectList.stream().filter(AbstractGameObject::isLive).collect(Collectors.toList());
-
         // 画出player
         player.paint(g);
 
@@ -60,8 +59,7 @@ public class GameModel implements Serializable {
 
         for (int i = 0; i < objectList.size(); i++) {
             AbstractGameObject go1 = objectList.get(i);
-            for (int j = 0; j < objectList.size(); j++) {
-                AbstractGameObject go2 = objectList.get(j);
+            for (AbstractGameObject go2 : objectList) {
                 collideChain.collide(go1, go2);
             }
             if (objectList.get(i).isLive()) {

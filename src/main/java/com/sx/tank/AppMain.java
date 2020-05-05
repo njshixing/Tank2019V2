@@ -1,7 +1,6 @@
 package com.sx.tank;
 
 import com.sx.tank.model.Audio;
-import com.sx.tank.net.TankClient;
 import com.sx.tank.net.TankWarClient;
 
 public class AppMain {

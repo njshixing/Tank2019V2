@@ -1,13 +1,12 @@
 package com.sx.tank.net;
 
 import com.sx.tank.TankFrame;
+import com.sx.tank.model.Msg;
 import com.sx.tank.model.Player;
 import com.sx.tank.model.TankJoinMsg;
 import com.sx.tank.utils.MsgDecoder;
 import com.sx.tank.utils.MsgEncoder;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -36,7 +35,7 @@ public class TankWarClient {
                                     .addLast(new MsgEncoder())
                                     .addLast(new ClientChildHandler());
                         }
-                    }).connect("localhost", 12345).sync();
+                    }).connect("localhost", 12306).sync();
             System.out.println("connected to server");
             future.channel().closeFuture().sync();
         } catch (Exception e) {
@@ -46,7 +45,7 @@ public class TankWarClient {
         }
     }
 
-    public void send(TankJoinMsg msg) {
+    public void send(Msg msg) {
         channel.writeAndFlush(msg);
     }
 
@@ -54,11 +53,10 @@ public class TankWarClient {
         channel.close();
     }
 
-    private static class ClientChildHandler extends SimpleChannelInboundHandler<TankJoinMsg> {
+    private static class ClientChildHandler extends SimpleChannelInboundHandler<Msg> {
 
         @Override
-        protected void channelRead0(ChannelHandlerContext ctx, TankJoinMsg msg) throws Exception {
-            System.out.println(msg.toString());
+        protected void channelRead0(ChannelHandlerContext ctx, Msg msg) throws Exception {
             msg.handle();
         }
 
