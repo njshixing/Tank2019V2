@@ -3,13 +3,12 @@ package com.sx.tank.service;
 import com.sx.tank.model.AbstractGameObject;
 import com.sx.tank.model.Bullet;
 import com.sx.tank.model.Player;
-import com.sx.tank.model.Tank;
 
-public class TankBulletCollide implements Collide {
+public class PlayerBulletCollide implements Collide {
     @Override
     public boolean collide(AbstractGameObject o1, AbstractGameObject o2) {
-        if (o1 instanceof Tank && o2 instanceof Bullet) {
-            Tank t1 = (Tank) o1;
+        if (o1 instanceof Player && o2 instanceof Bullet) {
+            Player t1 = (Player) o1;
             Bullet b1 = (Bullet) o2;
             System.out.println(t1.getGroup() + "==" + t1.getGroup());
             if (!t1.isLive() || !b1.isLive()) {
@@ -22,7 +21,7 @@ public class TankBulletCollide implements Collide {
                 t1.die();
                 b1.die();
             }
-        }else if(o2 instanceof Tank && o1 instanceof Bullet) {
+        }else if(o2 instanceof Player && o1 instanceof Bullet) {
             return collide(o2, o1);
         }
         return false;

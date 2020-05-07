@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.awt.*;
+import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -15,13 +16,16 @@ public class Bullet extends AbstractGameObject {
     public static final int W = ResourceMgr.bulletU.getWidth();
     public static final int H = ResourceMgr.bulletU.getHeight();
     private static final Integer SPEED = 6;
+    private UUID playerId;
     private int x, y;
     private Dir dir;
     private Group group;
+    private UUID id = UUID.randomUUID();
     private boolean live;
     private Rectangle rect;
 
-    public Bullet(int x, int y, Dir dir, Group group) {
+    public Bullet(UUID playerId, int x, int y, Dir dir, Group group) {
+        this.playerId = playerId;
         this.x = x;
         this.y = y;
         this.dir = dir;

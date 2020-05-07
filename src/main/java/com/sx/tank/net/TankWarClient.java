@@ -46,6 +46,7 @@ public class TankWarClient {
     }
 
     public void send(Msg msg) {
+        System.out.println(msg.toString());
         channel.writeAndFlush(msg);
     }
 
@@ -63,7 +64,6 @@ public class TankWarClient {
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             Player p = TankFrame.INSTANCE.getGm().getPlayer();
-            System.out.println(p.getId() + " online");
             ctx.writeAndFlush(new TankJoinMsg(p));
         }
 

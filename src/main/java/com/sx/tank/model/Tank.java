@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.Random;
+import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -34,6 +35,7 @@ public class Tank extends AbstractGameObject {
     private boolean bL, bR, bD, bU;
 
     private Group group;
+    private UUID id = UUID.randomUUID();
 
     private boolean live = true;
     private Random r = new Random();
@@ -132,7 +134,7 @@ public class Tank extends AbstractGameObject {
     private void fire() {
         int bX = x + width / 2 - ResourceMgr.bulletU.getWidth() / 2;
         int bY = y + height / 2 - ResourceMgr.bulletU.getHeight() / 2;
-        Bullet b = new Bullet(bX, bY, getDir(), getGroup());
+        Bullet b = new Bullet(id, bX, bY, getDir(), getGroup());
         TankFrame.INSTANCE.getGm().addObject(b);
     }
 

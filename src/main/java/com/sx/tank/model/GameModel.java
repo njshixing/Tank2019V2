@@ -27,14 +27,14 @@ public class GameModel implements Serializable {
         collideChain = new CollideChain();
         // 初始化游戏里面的物体
         initGameObject();
+        System.out.println("collideChain = " + collideChain);
     }
 
     private void initGameObject() {
         // 初始化player
         player = new Player(50 + r.nextInt(700), 50 + r.nextInt(600), Dir.randomDir(), Group.values()[r.nextInt(Group.values().length)]);
         // 敌人坦克
-//        int tankCount = new Random().nextInt(5) + 3;
-//        for (int i = 0; i < tankCount; i++) {
+//        for (int i = 0; i < 2; i++) {
 //            objectList.add(new Tank(100 + new Random().nextInt(100), 100, Dir.randomDir(), Group.BAD));
 //        }
     }

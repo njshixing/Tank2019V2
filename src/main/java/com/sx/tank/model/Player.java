@@ -1,5 +1,6 @@
 package com.sx.tank.model;
 
+import com.sx.tank.TankFrame;
 import com.sx.tank.net.TankWarClient;
 import com.sx.tank.service.FireStrategy;
 import com.sx.tank.utils.Dir;
@@ -34,12 +35,18 @@ public class Player extends AbstractGameObject {
     private boolean live = true;
 
     private UUID id = UUID.randomUUID();
+    private Rectangle rect;
+    // 坦克的高度和宽度
+    private int width, height;
 
     public Player(int x, int y, Dir dir, Group group) {
         this.x = x;
         this.y = y;
         this.dir = dir;
         this.group = group;
+        this.width = ResourceMgr.goodTankU.getWidth();
+        this.height = ResourceMgr.goodTankU.getHeight();
+        this.rect = new Rectangle(x, y, width, height);
     }
 
     public Player() {
@@ -52,10 +59,14 @@ public class Player extends AbstractGameObject {
         this.group = tankJoinMsg.getGroup();
         this.moving = tankJoinMsg.isMoving();
         this.id = tankJoinMsg.getUuid();
+        this.width = ResourceMgr.goodTankU.getWidth();
+        this.height = ResourceMgr.goodTankU.getHeight();
+        this.rect = new Rectangle(x, y, width, height);
     }
 
     @Override
     public void paint(Graphics g) {
+        if (!isLive()) return;
         Color c = g.getColor();
         g.setColor(Color.yellow);
         g.drawString(this.getId().toString(), getX(), getY() - 10);
@@ -155,6 +166,7 @@ public class Player extends AbstractGameObject {
 
     private void setMainDir() {
         boolean oldMoving = this.moving;
+        Dir oldDir = this.dir;
         if (!bU && !bD && !bL && !bR) {
             moving = false;
             TankWarClient.INSTANCE.send(new TankStopMsg(this.id, this.x, this.y));
@@ -172,9 +184,17 @@ public class Player extends AbstractGameObject {
             if (!bU && !bD && !bL && bR) {
                 dir = Dir.R;
             }
+            if (!oldMoving) {
+                TankWarClient.INSTANCE.send(new TankMoveOrDirChangeMsg(this.x, this.y, this.dir, this.id));
+            }
+            if (!oldDir.equals(dir)) {
+                TankWarClient.INSTANCE.send(new TankMoveOrDirChangeMsg(this.x, this.y, this.dir, this.id));
+            }
         }
-        if (this.moving != oldMoving) {
-            TankWarClient.INSTANCE.send(new TankMoveOrDirChangeMsg(this.x, this.y, this.dir, this.id));
-        }
+    }
+
+    public void die() {
+        this.setLive(false);
+        TankFrame.INSTANCE.getGm().addObject(new Explode(x, y));
     }
 }

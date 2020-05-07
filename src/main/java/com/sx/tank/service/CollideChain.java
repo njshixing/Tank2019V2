@@ -31,6 +31,7 @@ public class CollideChain implements Collide {
     @Override
     public boolean collide(AbstractGameObject o1, AbstractGameObject o2) {
         for (Collide collide : collideList) {
+            System.out.println(collideList.size());
             if (!collide.collide(o1, o2)) {
                 return false;
             }
