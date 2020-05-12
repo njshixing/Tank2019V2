@@ -3,6 +3,7 @@ package com.sx.tank.net;
 import com.sx.tank.TankFrame;
 import com.sx.tank.model.Msg;
 import com.sx.tank.model.Player;
+import com.sx.tank.model.TankDieMsg;
 import com.sx.tank.model.TankJoinMsg;
 import com.sx.tank.utils.MsgDecoder;
 import com.sx.tank.utils.MsgEncoder;
@@ -46,7 +47,6 @@ public class TankWarClient {
     }
 
     public void send(Msg msg) {
-        System.out.println(msg.toString());
         channel.writeAndFlush(msg);
     }
 
@@ -58,12 +58,16 @@ public class TankWarClient {
 
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, Msg msg) throws Exception {
+            if(msg instanceof TankDieMsg){
+                System.out.println(msg);
+            }
             msg.handle();
         }
 
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             Player p = TankFrame.INSTANCE.getGm().getPlayer();
+            System.out.println("我的id是:" + p.getId());
             ctx.writeAndFlush(new TankJoinMsg(p));
         }
 

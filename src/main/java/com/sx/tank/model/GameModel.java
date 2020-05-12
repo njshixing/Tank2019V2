@@ -12,64 +12,55 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Data
 public class GameModel implements Serializable {
     private Player player;
-    private List<AbstractGameObject> objectList;
-    private CollideChain collideChain;
+    private List<AbstractGameObject> objects;
+    private CollideChain collideChain = new CollideChain();
 
     private Random r = new Random();
 
     public GameModel() {
-        objectList = new ArrayList<>();
-        collideChain = new CollideChain();
         // 初始化游戏里面的物体
         initGameObject();
-        System.out.println("collideChain = " + collideChain);
     }
 
     private void initGameObject() {
         // 初始化player
         player = new Player(50 + r.nextInt(700), 50 + r.nextInt(600), Dir.randomDir(), Group.values()[r.nextInt(Group.values().length)]);
-        // 敌人坦克
-//        for (int i = 0; i < 2; i++) {
-//            objectList.add(new Tank(100 + new Random().nextInt(100), 100, Dir.randomDir(), Group.BAD));
-//        }
+        objects = new ArrayList<>();
     }
 
     public void paint(Graphics g) {
         Color c = g.getColor();
         g.setColor(Color.WHITE);
-        g.drawString("objects:" + objectList.size(), 10, 50);
+        g.drawString("objects:" + objects.size(), 10, 50);
         g.setColor(c);
-        // 去除die的物体
-        objectList = objectList.stream().filter(AbstractGameObject::isLive).collect(Collectors.toList());
-        // 画出player
         player.paint(g);
 
-        for (int i = 0; i < objectList.size(); i++) {
-            AbstractGameObject object = objectList.get(i);
+        for (int i = 0; i < objects.size(); i++) {
+            AbstractGameObject object = objects.get(i);
             if (!object.isLive()) {
-                objectList.remove(object);
+                objects.remove(object);
                 break;
             }
         }
 
-        for (int i = 0; i < objectList.size(); i++) {
-            AbstractGameObject go1 = objectList.get(i);
-            for (AbstractGameObject go2 : objectList) {
+        for (int i = 0; i < objects.size(); i++) {
+            AbstractGameObject go1 = objects.get(i);
+            for (int j = 0; j < objects.size(); j++) {
+                AbstractGameObject go2 = objects.get(j);
                 collideChain.collide(go1, go2);
             }
-            if (objectList.get(i).isLive()) {
-                objectList.get(i).paint(g);
+            if (objects.get(i).isLive()) {
+                objects.get(i).paint(g);
             }
         }
     }
 
     public void addObject(AbstractGameObject obj) {
-        objectList.add(obj);
+        objects.add(obj);
     }
 
     public void save() {
@@ -112,7 +103,7 @@ public class GameModel implements Serializable {
     }
 
     public Player findTankByUuid(UUID uuid) {
-        for (AbstractGameObject object : objectList) {
+        for (AbstractGameObject object : objects) {
             if (object instanceof Player) {
                 Player p = (Player) object;
                 if (p.getId().equals(uuid)) {
@@ -120,6 +111,17 @@ public class GameModel implements Serializable {
                 }
             }
         }
+        return null;
+    }
+
+    public Bullet findBulletByUUID(UUID bulletId) {
+        for (AbstractGameObject o : objects) {
+            if (o instanceof Bullet) {
+                Bullet b = (Bullet) o;
+                if (bulletId.equals(b.getId())) return b;
+            }
+        }
+
         return null;
     }
 }
