@@ -84,12 +84,7 @@ public class TankDieMsg extends Msg {
         if (b != null) {
             b.die();
         }
-        System.out.println("==================================");
-        System.out.println(uuid);
-        System.out.println(TankFrame.INSTANCE.getGm().getPlayer().getId());
-        System.out.println("==================================");
         if (this.uuid.equals(TankFrame.INSTANCE.getGm().getPlayer().getId())) {
-            System.out.println("i am die");
             TankFrame.INSTANCE.getGm().getPlayer().die();
         } else {
             Player p = TankFrame.INSTANCE.getGm().findTankByUuid(this.uuid);
